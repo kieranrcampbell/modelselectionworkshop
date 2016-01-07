@@ -1,0 +1,93 @@
+\documentclass{article}
+
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsmath}
+
+\title{Likelihood ratio tests for differential expression across pseudotime}
+\author{Kieran Campbell \\
+\texttt{kieran.campbell@sjc.ox.ac.uk}}
+\renewcommand{\baselinestretch}{1.5}
+
+\begin{document}
+\maketitle
+
+\newcounter{question_num}
+\setcounter{question_num}{1}
+
+\section{Introduction}
+Many experiments involve cells progressing through a biological process such as differentiation or apoptosis (cell death). Using RNA sequencing the gene expression in individual cells can be measured. As a result the expression profile of each cell represents a distinct time point through the process, known as the \emph{pseudotime}, and algorithms have been developed to order cells and assign pseudotimes to them.
+
+Once cells have been ordered in pseudotime it is useful to find which genes are \emph{differentially expressed} across pseudotime (in other words, what genes change more than expected at random across pseudotime?). A simple way of doing this involves model selection: we construct a null model that relates to no differential expression and an alternative model that relates expression to some function of pseudotime, then pick the model that best explains the differential expression. If this model is the alternative model, we designate the gene as differentially expressed.
+
+\subsection{Model}
+
+Let $y_{ij}$ denote the $\log_2$ gene expression of gene $i$ in cell $j$ at pseudotime $t_j$ then
+\begin{equation}
+y_{ij}(t_j) \sim \mathcal{N}(\mu_i(t_j), \; \sigma_i^2)
+\end{equation}
+where
+\begin{equation}
+    \mu_i(t_j) =
+\begin{cases}
+    \hfil  \mu^{(0)}_i, & \text{if } \text{gene $i$ not differentially expressed},  \\
+    \frac{2 \mu^{(0)}_i}{1 + \exp\left(-k_i(t_j - t^{(0)}_i)\right)}, &  \text{if gene $i$ differentially expressed}.
+\end{cases}
+\end{equation}
+
+\section{Assignment}
+
+\paragraph{1.} Why is using a likelihood ratio test suitable for comparing these models?
+
+\paragraph{2.} How many degrees of freedom does the null model have? How many does the alternative model have?
+
+\paragraph{Interlude}
+Recall that for a likelihood ratio test the statistic
+$$D = -2\ln(\text{likelihood for null model}) + 2\ln(\text{likelihood for alternative model})$$
+follows a $\chi^2$ distribution with $\text{df}_a - \text{df}_n$ degrees of freedom (where $\text{df}_a$ and $\text{df}_n$ are the degrees of freedom for the alternative and null models respectively).
+
+The rest of this assignment will follow in \texttt{R}. It is recommended you work through each command listed here to set yourself up for the assignment questions. If you would prefer to continue in Python you'll have to be comfortable with numerical optimisation of the log-likelihood of the above model.
+
+First install the \texttt{R} package \texttt{modelselectionworkshop}:
+<<install_package, eval=FALSE>>=
+install.packages("devtools")
+devtools::install_github("kieranrcampbell/modelselectionworkshop")
+@
+
+This includes a 500 by 155 matrix of gene expression measurements (for 500 genes and 155 cells) \texttt{X} and a 155 element vector \texttt{pseudotime} of pseudotimes for each cell. In \texttt{r} we can load data associated with a package by calling \texttt{data} and view the structure of any items using \texttt{str}:
+
+<<load-data>>=
+library(modelselectionworkshop) # load package
+data(X)
+data(pseudotime)
+str(X)
+str(pseudotime)
+@
+
+To get a feel for the data let's look at the first gene. In \texttt{R} we index matrices using square brackets, with the first value corresponding to subsetting on the row and second on the column. The \texttt{plot} command comes in handy for quickly looking at data:
+
+<<first, fig.width=4, fig.height=4, fig.align='center'>>=
+x <- X[1,]
+plot(pseudotime, x)
+@
+
+The functions \texttt{fit\_null\_model} and \texttt{fit\_alt\_model} provided by the package fit the two models and provide the log likelihoods at the maximum likelihood estimates. These return \texttt{list} objects in \texttt{R}, with two entries: \texttt{par} corresponding to the parameter vector and \texttt{loglik} corresponding to the log-likelihood. (Hint: in \texttt{R} an element named \texttt{e} in the list \texttt{L} can be accessed using the dollar sign like \texttt{L\$e}.)
+
+
+<<fit_models>>=
+null_model <- fit_null_model(x)
+alt_model <- fit_alt_model(x, pseudotime)
+print(null_model)
+print(alt_model)
+@
+
+\paragraph{3.} Find a $p$-value for the first gene being differentially expressed. (Hint: \texttt{pchisq} will come in handy.)
+
+\paragraph{4.} Find $p$-values for all genes in the dataset. (Hints: \texttt{apply} can be used to apply a function over a matrix. \texttt{myfunc <- function(arg1, arg2)} defines a function in \texttt{R}).
+
+\paragraph{5.} What subsequent analysis needs done before we can decide if a gene is differentially expressed? (Hint: \texttt{p.adjust} will come in handy.)
+
+\paragraph{6.} What are the other weaknesses of this method?
+
+
+
+\end{document}
