@@ -80,13 +80,15 @@ print(null_model)
 print(alt_model)
 @
 
-\paragraph{3.} Find a $p$-value for the first gene being differentially expressed. (Hint: \texttt{pchisq} will come in handy.)
+\paragraph{3.} What is a $p$-value? What \emph{isn't} a $p$-value?
 
-\paragraph{4.} Find $p$-values for all genes in the dataset. (Hints: \texttt{apply} can be used to apply a function over a matrix. \texttt{myfunc <- function(arg1, arg2)} defines a function in \texttt{R}).
+\paragraph{4.} Find a $p$-value for the first gene being differentially expressed. (Hint: \texttt{pchisq} will come in handy.)
 
-\paragraph{5.} What subsequent analysis needs done before we can decide if a gene is differentially expressed? (Hint: \texttt{p.adjust} will come in handy.)
+\paragraph{5.} Find $p$-values for all genes in the dataset. (Hints: \texttt{apply} can be used to apply a function over a matrix. \texttt{myfunc <- function(arg1, arg2)} defines a function in \texttt{R}).
 
-\paragraph{6.} What are the other weaknesses of this method?
+\paragraph{6.} What subsequent analysis needs done before we can decide if a gene is differentially expressed? (Hint: \texttt{p.adjust} will come in handy.)
+
+\paragraph{7.} What are the other weaknesses of this method?
 
 
 
