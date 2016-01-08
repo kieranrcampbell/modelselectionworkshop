@@ -3,7 +3,7 @@
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 \usepackage{amsmath}
 
-\title{Likelihood ratio tests for differential expression across pseudotime}
+\title{Likelihood ratio tests for model selection}
 \author{Kieran Campbell \\
 \texttt{kieran.campbell@sjc.ox.ac.uk}}
 \renewcommand{\baselinestretch}{1.5}
@@ -15,6 +15,67 @@
 \setcounter{question_num}{1}
 
 \section{Introduction}
+
+One way to compare two statistical models is by using the Likelihood Ratio Test (LRT). If we fit two models $M_1$ and $M_2$ to some data, how do we decide whether to favour $M_1$ over $M_2$? We will have two values for the (log-) likelihood at the maximum likelihood estimates $l_1$ and $l_2$, so in theory we could pick the model that gives the larger likelihood. However, if we increase the number of parameters in model 2 over model 1, we can \emph{always} increase the likelihood (akin to over-fitting) and the likelihoods are themselves random variables, implying there will be statistical uncertainty as to whether $l_2 > l_1$.
+
+The LRT provides a solution to this. It models the difference in log-likelihoods as a random variable and takes into account the number of parameters in each model. Consequently, we can say the probability of seeing a difference in log-likelihoods as extreme as we do if the models are just as good as each other.
+
+Specifically
+\begin{equation} \label{lrt}
+D = -2\ln(\text{likelihood for null model}) + 2\ln(\text{likelihood for alternative model})
+\end{equation}
+follows a $\chi^2$ distribution with $\text{df}_a - \text{df}_n$ degrees of freedom (where $\text{df}_a$ and $\text{df}_n$ are the degrees of freedom for the alternative and null models respectively).
+
+The rest of this tutorial follows in \texttt{R}. It is recommended you work through all the code to set yourself up for the assignment.
+
+\section{Basic example: linear regression}
+
+One application is to decide whether some data follows a linear trend or a flat one. This is equivalent to choosing between the linear models
+$$ y \sim \mathcal{N}(\beta_0, \sigma^2) $$
+and
+$$ y \sim \mathcal{N}(\beta_0 + \beta_1 x, \sigma^2) $$
+
+\paragraph{1.} If we set $\beta_1 = 0$ the second model becomes the first. This means we can use the LRT. Why?
+
+\paragraph{2.} We can think of the degrees of freedom as the number of free parameters. How many degrees of freedom do the two models have? What's the difference between them?
+
+\paragraph{}
+
+To begin this example, install the \texttt{R} package \texttt{modelselectionworkshop}:
+<<install-package, eval=FALSE>>=
+install.packages("devtools")
+devtools::install_github("kieranrcampbell/modelselectionworkshop")
+@
+
+Some example data called \texttt{linearExample} is included. To load data in \texttt{R}, call \texttt{data}. To view the structure of data, call \texttt{str}:
+
+<<e-data>>=
+library(modelselectionworkshop) # load the modelselectionworkshop package
+data(linearExample)
+str(linearExample)
+@
+This is a \texttt{list} object in which elements can be accessed using the dollar operator. There are four elements included: \texttt{x} and \texttt{y} - samples of independent and dependent variables, and \texttt{null\_loglik} and \texttt{alt\_loglik} - log-likelihoods at the maximum likelihood estimates for a flat model (the null) and a linear model (the alternative). We can plot the data in \texttt{R} using the \texttt{plot} command:
+
+<<plot-data, fig.width=5, fig.height=4, fig.align='center'>>=
+plot(linearExample$x, linearExample$y)
+@
+
+We can form the statistic $D$ defined in equation \ref{lrt}:
+<<D>>=
+D = -2 * linearExample$null_loglik + 2 * linearExample$alt_loglik
+print(D)
+@
+
+To find the probability of seeing a difference in log-likelihoods, we evaluate $D$ with respect to the $\chi^2$ distribution (in case you didn't get it earlier, the alternative model has 3 degrees of freedom, the null 2 so the $\chi^2$ will have $3-2=1$). We do this using the \texttt{pchisq} function in \texttt{R}. Since we want the cumulative probability for all values of $D$ \emph{greater} than the observed, we set \texttt{lower.tail = FALSE}. Therefore, our $p$-value becomes:
+<<p-val>>=
+pchisq(D, df = 1, lower.tail = FALSE)
+@
+
+In standard frequentist hypothesis testing, a $p$-value of less than 0.05 is considered small enough to reject the null hypothesis (but, confusingly, not to \emph{accept the alternative}), so given how small our $p$-value is we can be (fairly?) confident that our data follows a linear trend.
+
+\paragraph{3. (optional)} What is a $p$-value? What \emph{isn't} a $p$-value?
+
+\section{Biological application: pseudotime}
 Many experiments involve cells progressing through a biological process such as differentiation or apoptosis (cell death). Using RNA sequencing the gene expression in individual cells can be measured. As a result the expression profile of each cell represents a distinct time point through the process, known as the \emph{pseudotime}, and algorithms have been developed to order cells and assign pseudotimes to them.
 
 Once cells have been ordered in pseudotime it is useful to find which genes are \emph{differentially expressed} across pseudotime (in other words, what genes change more than expected at random across pseudotime?). A simple way of doing this involves model selection: we construct a null model that relates to no differential expression and an alternative model that relates expression to some function of pseudotime, then pick the model that best explains the differential expression. If this model is the alternative model, we designate the gene as differentially expressed.
@@ -34,26 +95,12 @@ where
 \end{cases}
 \end{equation}
 
-\section{Assignment}
+\paragraph{4.} Why is using a likelihood ratio test suitable for comparing these models?
 
-\paragraph{1.} Why is using a likelihood ratio test suitable for comparing these models?
+\paragraph{5.} How many degrees of freedom does the null model have? How many does the alternative model have?
 
-\paragraph{2.} How many degrees of freedom does the null model have? How many does the alternative model have?
-
-\paragraph{Interlude}
-Recall that for a likelihood ratio test the statistic
-$$D = -2\ln(\text{likelihood for null model}) + 2\ln(\text{likelihood for alternative model})$$
-follows a $\chi^2$ distribution with $\text{df}_a - \text{df}_n$ degrees of freedom (where $\text{df}_a$ and $\text{df}_n$ are the degrees of freedom for the alternative and null models respectively).
-
-The rest of this assignment will follow in \texttt{R}. It is recommended you work through each command listed here to set yourself up for the assignment questions. If you would prefer to continue in Python you'll have to be comfortable with numerical optimisation of the log-likelihood of the above model.
-
-First install the \texttt{R} package \texttt{modelselectionworkshop}:
-<<install_package, eval=FALSE>>=
-install.packages("devtools")
-devtools::install_github("kieranrcampbell/modelselectionworkshop")
-@
-
-This includes a 500 by 155 matrix of gene expression measurements (for 500 genes and 155 cells) \texttt{X} and a 155 element vector \texttt{pseudotime} of pseudotimes for each cell. In \texttt{r} we can load data associated with a package by calling \texttt{data} and view the structure of any items using \texttt{str}:
+\paragraph{}
+The \texttt{modelselectionworkshop} package includes a 500 by 155 matrix of gene expression measurements (for 500 genes and 155 cells) \texttt{X} and a 155 element vector \texttt{pseudotime} of pseudotimes for each cell:
 
 <<load-data>>=
 library(modelselectionworkshop) # load package
@@ -80,15 +127,13 @@ print(null_model)
 print(alt_model)
 @
 
-\paragraph{3.} What is a $p$-value? What \emph{isn't} a $p$-value?
+\paragraph{6.} Find a $p$-value for the first gene being differentially expressed. (Hint: \texttt{pchisq} will come in handy.)
 
-\paragraph{4.} Find a $p$-value for the first gene being differentially expressed. (Hint: \texttt{pchisq} will come in handy.)
+\paragraph{7.} Find $p$-values for all genes in the dataset. (Hints: \texttt{apply} can be used to apply a function over a matrix. \texttt{myfunc <- function(arg1, arg2)} defines a function in \texttt{R}). If you have computed multiple $p$-values during an analysis, always histogram them (using \texttt{hist()}). If the null hypotheses are true for all genes the $p$-values should follow a uniform distribution.
 
-\paragraph{5.} Find $p$-values for all genes in the dataset. (Hints: \texttt{apply} can be used to apply a function over a matrix. \texttt{myfunc <- function(arg1, arg2)} defines a function in \texttt{R}). If you have computed multiple $p$-values during an analysis, always histogram them (using \texttt{hist()}). If the null hypotheses are true for all genes the $p$-values should follow a uniform distribution.
+\paragraph{8.} What subsequent analysis needs done before we can decide if a gene is differentially expressed? (Hint: \texttt{p.adjust} will come in handy.)
 
-\paragraph{6.} What subsequent analysis needs done before we can decide if a gene is differentially expressed? (Hint: \texttt{p.adjust} will come in handy.)
-
-\paragraph{7.} What are the other weaknesses of this method?
+\paragraph{9.} What are the other weaknesses of this method?
 
 
 
