@@ -210,7 +210,8 @@ fit_null_model <- function(x) {
   r <-  norm_fit_null_model(x)
   res <- list()
   res$par <- r$par
-  res$loglik <- r$value
+  names(res$par) <- c("mu0", "sig_sq")
+  res$loglik <- -r$value
   return(res)
 }
 
@@ -218,7 +219,9 @@ fit_alt_model <- function(x, t) {
   r <- norm_fit_alt_model(x, t)
   res <- list()
   res$par <- r$par
-  res$loglik <- r$value
+  res$par[1] <- res$par[1] / 2
+  names(res$par)[1] <- "mu0"
+  res$loglik <- -r$value
   return(res)
 }
 

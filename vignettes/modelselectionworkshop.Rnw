@@ -84,7 +84,7 @@ print(alt_model)
 
 \paragraph{4.} Find a $p$-value for the first gene being differentially expressed. (Hint: \texttt{pchisq} will come in handy.)
 
-\paragraph{5.} Find $p$-values for all genes in the dataset. (Hints: \texttt{apply} can be used to apply a function over a matrix. \texttt{myfunc <- function(arg1, arg2)} defines a function in \texttt{R}).
+\paragraph{5.} Find $p$-values for all genes in the dataset. (Hints: \texttt{apply} can be used to apply a function over a matrix. \texttt{myfunc <- function(arg1, arg2)} defines a function in \texttt{R}). If you have computed multiple $p$-values during an analysis, always histogram them (using \texttt{hist()}). If the null hypotheses are true for all genes the $p$-values should follow a uniform distribution.
 
 \paragraph{6.} What subsequent analysis needs done before we can decide if a gene is differentially expressed? (Hint: \texttt{p.adjust} will come in handy.)
 
