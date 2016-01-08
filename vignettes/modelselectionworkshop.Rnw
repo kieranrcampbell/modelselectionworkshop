@@ -73,7 +73,8 @@ pchisq(D, df = 1, lower.tail = FALSE)
 
 In standard frequentist hypothesis testing, a $p$-value of less than 0.05 is considered small enough to reject the null hypothesis (but, confusingly, not to \emph{accept the alternative}), so given how small our $p$-value is we can be (fairly?) confident that our data follows a linear trend.
 
-\paragraph{3. (optional)} What is a $p$-value? What \emph{isn't} a $p$-value?
+\paragraph{3a. (optional)} What is a $p$-value? What \emph{isn't} a $p$-value?
+\paragraph{3b. (optional)} What is the range of the likelihood function (in other words, what set of values could the likelihoods we compute possibly have)? What is the range of the log-likelihood function?
 
 \section{Biological application: pseudotime}
 Many experiments involve cells progressing through a biological process such as differentiation or apoptosis (cell death). Using RNA sequencing the gene expression in individual cells can be measured. As a result the expression profile of each cell represents a distinct time point through the process, known as the \emph{pseudotime}, and algorithms have been developed to order cells and assign pseudotimes to them.
