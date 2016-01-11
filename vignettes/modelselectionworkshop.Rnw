@@ -54,7 +54,23 @@ library(modelselectionworkshop) # load the modelselectionworkshop package
 data(linearExample)
 str(linearExample)
 @
-This is a \texttt{list} object in which elements can be accessed using the dollar operator. There are four elements included: \texttt{x} and \texttt{y} - samples of independent and dependent variables, and \texttt{null\_loglik} and \texttt{alt\_loglik} - log-likelihoods at the maximum likelihood estimates for a flat model (the null) and a linear model (the alternative). We can plot the data in \texttt{R} using the \texttt{plot} command:
+This is a \texttt{list} object in which elements can be accessed using the dollar operator. There are four elements included: \texttt{x} and \texttt{y} - samples of independent and dependent variables, and \texttt{null\_loglik} and \texttt{alt\_loglik} - log-likelihoods at the maximum likelihood estimates for a flat model (the null) and a linear model (the alternative). 
+
+\paragraph{}
+\fbox{%
+\parbox{\textwidth}{
+\textbf{Some useful R commands}
+\begin{itemize}
+\item To get help for a command inside the \texttt{R} terminal call \texttt{?command}
+\item To find the dimension of a matrix/array \texttt{data} call \texttt{dim(data)}. If it's
+a vector then use \texttt{length(data)}
+\item To find the type of an object (e.g. integer or character) call \texttt{typeof(object)}. To find
+its class (e.g. matrix or vector) call \texttt{class(object)}
+\end{itemize}
+}}
+
+\paragraph{}
+We can plot the data in \texttt{R} using the \texttt{plot} command:
 
 <<plot-data, fig.width=5, fig.height=4, fig.align='center'>>=
 plot(linearExample$x, linearExample$y)
